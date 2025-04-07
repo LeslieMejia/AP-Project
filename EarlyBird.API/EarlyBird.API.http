@@ -1,0 +1,6 @@
+@EarlyBirdAPI_HostAddress = http://localhost:5147
+
+GET {{EarlyBirdAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

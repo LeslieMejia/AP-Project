@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "qanSfNsiT7M3rHFGGJR/4E02SZpPdtCdGtzz5DbHoY8=",
+  "Source": "EarlyBird.API",
+  "BasePath": "_content/EarlyBird.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

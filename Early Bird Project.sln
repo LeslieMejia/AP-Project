@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EarlyBirdAPI.Model", "EarlyBirdAPI.Model\EarlyBirdAPI.Model.csproj", "{661D2F3E-6417-4A92-B33D-6B719B80562E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EarlyBird.API", "EarlyBird.API\EarlyBird.API.csproj", "{E943AEB8-C678-4BEE-A6EE-FD424DC26246}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{661D2F3E-6417-4A92-B33D-6B719B80562E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{661D2F3E-6417-4A92-B33D-6B719B80562E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{661D2F3E-6417-4A92-B33D-6B719B80562E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{661D2F3E-6417-4A92-B33D-6B719B80562E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E943AEB8-C678-4BEE-A6EE-FD424DC26246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E943AEB8-C678-4BEE-A6EE-FD424DC26246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E943AEB8-C678-4BEE-A6EE-FD424DC26246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E943AEB8-C678-4BEE-A6EE-FD424DC26246}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1787223E-B327-48E4-B4E4-5F983ECAF43A}
+	EndGlobalSection
+EndGlobal
