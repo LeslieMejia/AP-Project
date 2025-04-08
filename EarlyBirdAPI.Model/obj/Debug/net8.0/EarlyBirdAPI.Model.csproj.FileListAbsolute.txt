@@ -13,3 +13,18 @@
 /Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.pdb
 /Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.genruntimeconfig.cache
 /Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/obj/Debug/net8.0/ref/EarlyBirdAPI.Model.dll
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/bin/Debug/net8.0/EarlyBirdAPI.Model.deps.json
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/bin/Debug/net8.0/EarlyBirdAPI.Model.runtimeconfig.json
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/bin/Debug/net8.0/EarlyBirdAPI.Model.dll
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/bin/Debug/net8.0/EarlyBirdAPI.Model.pdb
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.csproj.AssemblyReference.cache
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.GeneratedMSBuildEditorConfig.editorconfig
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.AssemblyInfoInputs.cache
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.AssemblyInfo.cs
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.csproj.CoreCompileInputs.cache
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.sourcelink.json
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.dll
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/refint/EarlyBirdAPI.Model.dll
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.pdb
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/EarlyBirdAPI.Model.genruntimeconfig.cache
+/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/Debug/net8.0/ref/EarlyBirdAPI.Model.dll
