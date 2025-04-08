@@ -1,5 +1,6 @@
 //using EarlyBirdAPI;
 //using EarlyBirdAPI.Model.Repositories;
+using EarlyBird.Model.Repositories;
 using EarlyBirdAPI.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,12 @@ builder.Services.AddDbContext<EarlyBirdDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("EBDatabase")));
 
 //This will make the UserRepository available for dependency injection in your controllers.
-//builder.Services.AddScoped<UserRepository, UserRepository>();
+builder.Services.AddScoped<UserRepository, UserRepository>();
+builder.Services.AddScoped<SavedJobRepository, SavedJobRepository>();
+builder.Services.AddScoped<ResumeRepository, ResumeRepository>();
+builder.Services.AddScoped<JobApplicationRepository,JobApplicationRepository>();
+
+
 
 
 

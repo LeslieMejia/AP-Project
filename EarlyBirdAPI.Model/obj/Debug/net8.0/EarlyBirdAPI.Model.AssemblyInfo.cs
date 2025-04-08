@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EarlyBirdAPI.Model")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+48637a0737640e0eb23cef85c3f3ba7a55f8959c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+530956012f8ab0102caddac54bee1f03c91553ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("EarlyBirdAPI.Model")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EarlyBirdAPI.Model")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
