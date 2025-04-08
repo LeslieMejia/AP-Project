@@ -10,12 +10,12 @@ namespace EarlyBirdAPI.Model
         {
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Job> Jobs { get; set; }
-        public DbSet<Resume> Resumes { get; set; }
-        public DbSet<JobApplication> JobApplications { get; set; }
-        public DbSet<ApplicationManagement> ApplicationManagements { get; set; }
-        public DbSet<SavedJob> SavedJobs { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<Job> Job { get; set; }
+        public DbSet<Resume> Resume { get; set; }
+        public DbSet<JobApplication> JobApplication { get; set; }
+        public DbSet<ApplicationManagement> ApplicationManagement { get; set; }
+        public DbSet<SavedJob> SavedJob { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

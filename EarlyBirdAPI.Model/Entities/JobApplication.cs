@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EarlyBirdAPI.Model.Entities;
 
-[Table("job_application")]
+[Table("job_applications")]
 public class JobApplication
 {
     [Key]

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj": {}
+    "/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj": {}
   },
   "projects": {
-    "/Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj": {
+    "/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj",
+        "projectUniqueName": "/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj",
         "projectName": "EarlyBirdAPI.Model",
-        "projectPath": "/Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj",
-        "packagesPath": "/Users/lesliem/.nuget/packages/",
-        "outputPath": "/Users/lesliem/Applied Programming/Early Bird Project/EarlyBirdAPI.Model/obj/",
+        "projectPath": "/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/EarlyBirdAPI.Model.csproj",
+        "packagesPath": "/Users/mathildeellemoseandersen/.nuget/packages/",
+        "outputPath": "/Users/mathildeellemoseandersen/AP-Project/EarlyBirdAPI.Model/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/lesliem/.nuget/NuGet/NuGet.Config"
+          "/Users/mathildeellemoseandersen/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
