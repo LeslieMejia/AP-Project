@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using EarlyBirdAPI.Model.Entities;
+﻿using EarlyBirdAPI.Model.Entities;
 
 namespace EarlyBirdAPI.Model
 {

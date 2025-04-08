@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EarlyBirdAPI.Model.Entities
 {
-    [Table("users")]
+    [Table("user")]
     public class User
     {
         [Key]
