@@ -1,4 +1,5 @@
 using EarlyBirdAPI.Model.Entities;
+using EarlyBirdAPI.Model.Repositories;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using NpgsqlTypes;
