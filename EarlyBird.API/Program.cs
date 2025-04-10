@@ -3,6 +3,7 @@
 using EarlyBird.Model.Repositories;
 using EarlyBirdAPI.Model;
 using Microsoft.EntityFrameworkCore;
+using EarlyBirdAPI.Model.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ builder.Services.AddScoped<UserRepository, UserRepository>();
 builder.Services.AddScoped<SavedJobRepository, SavedJobRepository>();
 builder.Services.AddScoped<ResumeRepository, ResumeRepository>();
 builder.Services.AddScoped<JobApplicationRepository, JobApplicationRepository>();
+builder.Services.AddScoped<ApplicationManagementRepository>();
+builder.Services.AddScoped<JobRepository>();
 
 
 
