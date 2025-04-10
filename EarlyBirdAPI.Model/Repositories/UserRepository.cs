@@ -75,7 +75,7 @@ namespace EarlyBird.Model.Repositories
             {
                 var cmd = dbConn.CreateCommand();
                 cmd.CommandText = "SELECT * FROM users";
-                
+
                 var data = GetData(dbConn, cmd);
                 var users = new List<User>();
                 while (data != null && data.Read())
