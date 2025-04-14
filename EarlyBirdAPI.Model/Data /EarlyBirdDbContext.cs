@@ -1,4 +1,5 @@
 ﻿using EarlyBirdAPI.Model.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace EarlyBirdAPI.Model
 {
@@ -9,12 +10,12 @@ namespace EarlyBirdAPI.Model
         {
         }
 
-        public DbSet<User> User { get; set; }
-        public DbSet<Job> Job { get; set; }
-        public DbSet<Resume> Resume { get; set; }
-        public DbSet<JobApplication> JobApplication { get; set; }
-        public DbSet<ApplicationManagement> ApplicationManagement { get; set; }
-        public DbSet<SavedJob> SavedJob { get; set; }
+        public DbSet<User> Users { get; set; }  // Maps to 'users' table
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<Resume> Resumes { get; set; }
+        public DbSet<JobApplication> JobApplications { get; set; }
+        public DbSet<ApplicationManagement> ApplicationManagement { get; set; }  // Corrected: Singular name for ApplicationManagement
+        public DbSet<SavedJob> SavedJobs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,7 +25,12 @@ namespace EarlyBirdAPI.Model
                 .HasPostgresEnum("jobposting_status", new[] { "open", "closed" })
                 .HasPostgresEnum("user_role", new[] { "employer", "jobseeker" });
 
-            // OPTIONAL: Custom constraints or indexes not handled by attributes
+            // Mapping UserRole as string in DB
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasConversion<string>();
+
+            // Optional: Ensure email is unique
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
