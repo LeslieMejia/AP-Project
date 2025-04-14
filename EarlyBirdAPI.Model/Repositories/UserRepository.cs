@@ -49,6 +49,8 @@ namespace EarlyBird.Model.Repositories
                 var data = GetData(dbConn, cmd);
                 if (data != null && data.Read())
                 {
+#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8604 // Possible null reference argument.
                     return new User
                     {
                         UserId = Convert.ToInt32(data["user_id"]),
@@ -61,6 +63,8 @@ namespace EarlyBird.Model.Repositories
                         CreatedAt = data["created_at"] as DateTime?,
                         Role = Enum.Parse<UserRole>(data["role"].ToString())
                     };
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8601 // Possible null reference assignment.
                 }
                 return null;
             }
