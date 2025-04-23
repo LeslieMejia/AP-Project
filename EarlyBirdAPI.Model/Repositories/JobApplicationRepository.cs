@@ -6,129 +6,149 @@ using NpgsqlTypes;
 using System;
 using System.Collections.Generic;
 
-namespace EarlyBird.Model.Repositories
+namespace EarlyBirdAPI.Model.Repositories
 {
     public class JobApplicationRepository : BaseRepository
     {
         public JobApplicationRepository(IConfiguration configuration) : base(configuration) { }
 
-        // C - Insert a new job application
-        public bool InsertJobApplication(JobApplication app)
+        // R - Get a job application by ID
+        public JobApplication? GetJobApplicationById(int id)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection dbConn = null;
+            try
             {
+                dbConn = new NpgsqlConnection(ConnectionString);
                 var cmd = dbConn.CreateCommand();
-                cmd.CommandText = @"
-                    INSERT INTO job_applications (user_id, job_id, resume_id, cover_letter, status, applied_at)
-                    VALUES (@user_id, @job_id, @resume_id, @cover_letter, @status, @applied_at)
-                ";
-
-                cmd.Parameters.AddWithValue("@user_id", NpgsqlDbType.Integer, app.UserId);
-                cmd.Parameters.AddWithValue("@job_id", NpgsqlDbType.Integer, app.JobId);
-                cmd.Parameters.AddWithValue("@resume_id", NpgsqlDbType.Integer, app.ResumeId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@cover_letter", NpgsqlDbType.Text, app.CoverLetter ?? (object)DBNull.Value);
-                // Convert enum to string since our SQL column is text (or use correct enum mapping)
-                cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, app.Status.ToString());
-                cmd.Parameters.AddWithValue("@applied_at", NpgsqlDbType.Timestamp, app.AppliedAt ?? DateTime.UtcNow);
-
-                return InsertData(dbConn, cmd);
-            }
-        }
-
-        // R - Get a job application by its ID
-        public JobApplication? GetJobApplicationById(int applicationId)
-        {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
-            {
-                var cmd = dbConn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM job_applications WHERE application_id = @application_id";
-                cmd.Parameters.AddWithValue("@application_id", NpgsqlDbType.Integer, applicationId);
+                cmd.CommandText = "SELECT * FROM public.jobapplication WHERE id = @id";
+                cmd.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
 
                 var data = GetData(dbConn, cmd);
                 if (data != null && data.Read())
                 {
                     return new JobApplication
                     {
-                        ApplicationId = Convert.ToInt32(data["application_id"]),
-                        UserId = Convert.ToInt32(data["user_id"]),
-                        JobId = Convert.ToInt32(data["job_id"]),
-                        ResumeId = data["resume_id"] != DBNull.Value ? Convert.ToInt32(data["resume_id"]) : null,
-                        CoverLetter = data["cover_letter"] as string,
-                        Status = Enum.Parse<ApplicationStatus>(data["status"].ToString() ?? "UnderReview"),
-                        AppliedAt = data["applied_at"] as DateTime?
+                        Id = Convert.ToInt32(data["id"]),
+                        JobId = Convert.ToInt32(data["jobid"]),
+                        JobSeekerId = Convert.ToInt32(data["jobseekerid"]),
+                        ResumeId = data["resumeid"] is DBNull ? null : (int?)Convert.ToInt32(data["resumeid"]),
+                        CoverLetter = data["coverletter"] as string,
+                        Status = Enum.Parse<ApplicationStatus>(data["status"].ToString()!)
                     };
                 }
                 return null;
             }
+            finally
+            {
+                dbConn?.Close();
+            }
         }
 
-        // R - Get all job applications (or you could filter by user or job)
+        // R - Get all job applications
         public List<JobApplication> GetJobApplications()
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection dbConn = null;
+            var applications = new List<JobApplication>();
+            try
             {
+                dbConn = new NpgsqlConnection(ConnectionString);
                 var cmd = dbConn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM job_applications";
+                cmd.CommandText = "SELECT * FROM public.jobapplication";
 
                 var data = GetData(dbConn, cmd);
-                var apps = new List<JobApplication>();
-                while (data != null && data.Read())
+                if (data != null)
                 {
-                    apps.Add(new JobApplication
+                    while (data.Read())
                     {
-                        ApplicationId = Convert.ToInt32(data["application_id"]),
-                        UserId = Convert.ToInt32(data["user_id"]),
-                        JobId = Convert.ToInt32(data["job_id"]),
-                        ResumeId = data["resume_id"] != DBNull.Value ? Convert.ToInt32(data["resume_id"]) : null,
-                        CoverLetter = data["cover_letter"] as string,
-                        Status = Enum.Parse<ApplicationStatus>(data["status"].ToString() ?? "UnderReview"),
-                        AppliedAt = data["applied_at"] as DateTime?
-                    });
+                        var app = new JobApplication
+                        {
+                            Id = Convert.ToInt32(data["id"]),
+                            JobId = Convert.ToInt32(data["jobid"]),
+                            JobSeekerId = Convert.ToInt32(data["jobseekerid"]),
+                            ResumeId = data["resumeid"] is DBNull ? null : (int?)Convert.ToInt32(data["resumeid"]),
+                            CoverLetter = data["coverletter"] as string,
+                            Status = Enum.Parse<ApplicationStatus>(data["status"].ToString()!)
+                        };
+                        applications.Add(app);
+                    }
                 }
-                return apps;
+                return applications;
+            }
+            finally
+            {
+                dbConn?.Close();
+            }
+        }
+
+        // C - Insert a new job application
+        public bool InsertJobApplication(JobApplication app)
+        {
+            NpgsqlConnection dbConn = null;
+            try
+            {
+                dbConn = new NpgsqlConnection(ConnectionString);
+                var cmd = dbConn.CreateCommand();
+                cmd.CommandText = @"
+                    INSERT INTO public.jobapplication
+                    (jobid, jobseekerid, resumeid, coverletter, status)
+                    VALUES
+                    (@jobid, @jobseekerid, @resumeid, @coverletter, @status);
+                ";
+
+                cmd.Parameters.AddWithValue("@jobid", NpgsqlDbType.Integer, app.JobId);
+                cmd.Parameters.AddWithValue("@jobseekerid", NpgsqlDbType.Integer, app.JobSeekerId);
+                cmd.Parameters.AddWithValue("@resumeid", app.ResumeId.HasValue ? 
+                    new NpgsqlParameter("@resumeid", NpgsqlDbType.Integer) { Value = app.ResumeId.Value } : 
+                    new NpgsqlParameter("@resumeid", NpgsqlDbType.Integer) { Value = DBNull.Value });
+                cmd.Parameters.AddWithValue("@coverletter", NpgsqlDbType.Text, app.CoverLetter ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, app.Status.ToString());
+
+                return InsertData(dbConn, cmd);
+            }
+            finally
+            {
+                dbConn?.Close();
             }
         }
 
         // U - Update an existing job application
         public bool UpdateJobApplication(JobApplication app)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
-            {
-                var cmd = dbConn.CreateCommand();
-                cmd.CommandText = @"
-                    UPDATE job_applications SET
-                        user_id = @user_id,
-                        job_id = @job_id,
-                        resume_id = @resume_id,
-                        cover_letter = @cover_letter,
-                        status = @status,
-                        applied_at = @applied_at
-                    WHERE application_id = @application_id
-                ";
+            var dbConn = new NpgsqlConnection(ConnectionString);
+            var cmd = dbConn.CreateCommand();
+            cmd.CommandText = @"
+                UPDATE public.jobapplication SET
+                    jobid = @jobid,
+                    jobseekerid = @jobseekerid,
+                    resumeid = @resumeid,
+                    coverletter = @coverletter,
+                    status = @status
+                WHERE id = @id;
+            ";
 
-                cmd.Parameters.AddWithValue("@user_id", NpgsqlDbType.Integer, app.UserId);
-                cmd.Parameters.AddWithValue("@job_id", NpgsqlDbType.Integer, app.JobId);
-                cmd.Parameters.AddWithValue("@resume_id", NpgsqlDbType.Integer, app.ResumeId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@cover_letter", NpgsqlDbType.Text, app.CoverLetter ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, app.Status.ToString());
-                cmd.Parameters.AddWithValue("@applied_at", NpgsqlDbType.Timestamp, app.AppliedAt ?? DateTime.UtcNow);
-                cmd.Parameters.AddWithValue("@application_id", NpgsqlDbType.Integer, app.ApplicationId);
+            cmd.Parameters.AddWithValue("@jobid", NpgsqlDbType.Integer, app.JobId);
+            cmd.Parameters.AddWithValue("@jobseekerid", NpgsqlDbType.Integer, app.JobSeekerId);
+            cmd.Parameters.AddWithValue("@resumeid", app.ResumeId.HasValue ?
+                new NpgsqlParameter("@resumeid", NpgsqlDbType.Integer) { Value = app.ResumeId.Value } :
+                new NpgsqlParameter("@resumeid", NpgsqlDbType.Integer) { Value = DBNull.Value });
+            cmd.Parameters.AddWithValue("@coverletter", NpgsqlDbType.Text, app.CoverLetter ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, app.Status.ToString());
+            cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, app.Id);
 
-                return UpdateData(dbConn, cmd);
-            }
+            return UpdateData(dbConn, cmd);
         }
 
-        // D - Delete a job application by ID
-        public bool DeleteJobApplication(int applicationId)
+        // D - Delete a job application
+        public bool DeleteJobApplication(int id)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
-            {
-                var cmd = dbConn.CreateCommand();
-                cmd.CommandText = "DELETE FROM job_applications WHERE application_id = @application_id";
-                cmd.Parameters.AddWithValue("@application_id", NpgsqlDbType.Integer, applicationId);
+            var dbConn = new NpgsqlConnection(ConnectionString);
+            var cmd = dbConn.CreateCommand();
+            cmd.CommandText = "DELETE FROM public.jobapplication WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, id);
 
-                return DeleteData(dbConn, cmd);
-            }
+            return DeleteData(dbConn, cmd);
         }
     }
 }
+
+

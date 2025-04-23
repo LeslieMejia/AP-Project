@@ -1,14 +1,16 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using EarlyBirdAPI.Model.Entities;
+using EarlyBirdAPI.Model.Entities;         // Your entity classes (User, etc.)
 using EarlyBird.Model.Repositories;
-using System.Collections.Generic;
+using EarlyBirdAPI.Model.Repositories;
 
-namespace EarlyBirdAPI.Controllers
+namespace EarlyBird.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class JobApplicationController : ControllerBase
     {
+        // Dependency injection of the repository
         protected JobApplicationRepository Repository { get; }
 
         public JobApplicationController(JobApplicationRepository repository)
@@ -17,85 +19,88 @@ namespace EarlyBirdAPI.Controllers
         }
 
         // GET: api/JobApplication/{id}
+        // Returns a specific job application by ID
         [HttpGet("{id}")]
         public ActionResult<JobApplication> GetJobApplication([FromRoute] int id)
         {
-            JobApplication? app = Repository.GetJobApplicationById(id);
-            if (app == null)
+            JobApplication application = Repository.GetJobApplicationById(id);
+            if (application == null)
             {
-                return NotFound($"Job application with id {id} not found");
+                return NotFound(); // Returns 404 if not found
             }
-            return Ok(app);
+            return Ok(application); // Returns 200 with application
         }
 
         // GET: api/JobApplication
+        // Returns all job applications
         [HttpGet]
         public ActionResult<IEnumerable<JobApplication>> GetJobApplications()
         {
-            List<JobApplication> apps = Repository.GetJobApplications();
-            if (apps == null || apps.Count == 0)
-            {
-                return NotFound("No job applications found");
-            }
-            return Ok(apps);
+            return Ok(Repository.GetJobApplications()); // Returns 200 with list
         }
 
         // POST: api/JobApplication
+        // Creates a new job application
         [HttpPost]
-        public ActionResult PostJobApplication([FromBody] JobApplication jobApp)
+        public ActionResult Post([FromBody] JobApplication application)
         {
-            if (jobApp == null)
+            if (application == null)
             {
-                return BadRequest("Job application data not provided");
+                return BadRequest("Job application data is not correct"); // 400 if body is null
             }
 
-            bool status = Repository.InsertJobApplication(jobApp);
+            bool status = Repository.InsertJobApplication(application);
             if (status)
             {
-                return Ok("Job application created successfully");
+                return Ok(); // 200 if insert successful
             }
-            return BadRequest("Failed to create job application");
+
+            return BadRequest("Failed to insert job application"); // 400 on failure
         }
 
         // PUT: api/JobApplication
+        // Updates an existing job application
         [HttpPut]
-        public ActionResult UpdateJobApplication([FromBody] JobApplication jobApp)
+        public ActionResult UpdateJobApplication([FromBody] JobApplication application)
         {
-            if (jobApp == null)
+            if (application == null)
             {
-                return BadRequest("Job application data not provided");
+                return BadRequest("Job application data is not correct"); // 400 if input is null
             }
 
-            JobApplication? existingApp = Repository.GetJobApplicationById(jobApp.ApplicationId);
-            if (existingApp == null)
+            JobApplication existing = Repository.GetJobApplicationById(application.Id);
+            if (existing == null)
             {
-                return NotFound($"Job application with id {jobApp.ApplicationId} not found");
+                return NotFound($"Job application with id {application.Id} not found"); // 404 if not found
             }
 
-            bool status = Repository.UpdateJobApplication(jobApp);
+            bool status = Repository.UpdateJobApplication(application);
             if (status)
             {
-                return Ok("Job application updated successfully");
+                return Ok(); // 200 if update successful
             }
-            return BadRequest("Failed to update job application");
+
+            return BadRequest("Something went wrong while updating"); // 400 if update fails
         }
 
         // DELETE: api/JobApplication/{id}
+        // Deletes a specific job application by ID
         [HttpDelete("{id}")]
         public ActionResult DeleteJobApplication([FromRoute] int id)
         {
-            JobApplication? existingApp = Repository.GetJobApplicationById(id);
-            if (existingApp == null)
+            JobApplication existing = Repository.GetJobApplicationById(id);
+            if (existing == null)
             {
-                return NotFound($"Job application with id {id} not found");
+                return NotFound($"Job application with id {id} not found"); // 404 if not found
             }
 
             bool status = Repository.DeleteJobApplication(id);
             if (status)
             {
-                return NoContent(); // Successfully deleted, no content to return
+                return NoContent(); // 204 if deletion successful
             }
-            return BadRequest($"Unable to delete job application with id {id}");
+
+            return BadRequest($"Unable to delete job application with id {id}"); // 400 if deletion fails
         }
     }
 }

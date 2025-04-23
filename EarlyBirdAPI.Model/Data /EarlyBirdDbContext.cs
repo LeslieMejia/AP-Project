@@ -10,13 +10,11 @@ namespace EarlyBirdAPI.Model
         {
         }
 
-        public DbSet<User> Users { get; set; }  // Maps to 'users' table
-        public DbSet<Job> Jobs { get; set; }
-        public DbSet<Resume> Resumes { get; set; }
-        public DbSet<JobApplication> JobApplications { get; set; }
-        public DbSet<ApplicationManagement> ApplicationManagement { get; set; }  // Corrected: Singular name for ApplicationManagement
-        public DbSet<SavedJob> SavedJobs { get; set; }
-
+        public DbSet<User> User { get; set; }  // Maps to 'users' table
+        public DbSet<Job> Job { get; set; }
+        public DbSet<Resume> Resume { get; set; }
+        public DbSet<JobApplication> JobApplication { get; set; }
+       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // PostgreSQL enums

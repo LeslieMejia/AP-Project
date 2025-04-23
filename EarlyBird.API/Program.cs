@@ -16,11 +16,9 @@ builder.Services.AddDbContext<EarlyBirdDbContext>(options =>
 
 //This will make the UserRepository available for dependency injection in your controllers.
 builder.Services.AddScoped<UserRepository, UserRepository>();
-builder.Services.AddScoped<SavedJobRepository, SavedJobRepository>();
 builder.Services.AddScoped<ResumeRepository, ResumeRepository>();
+builder.Services.AddScoped<JobRepository, JobRepository>();
 builder.Services.AddScoped<JobApplicationRepository, JobApplicationRepository>();
-builder.Services.AddScoped<ApplicationManagementRepository>();
-builder.Services.AddScoped<JobRepository>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -12,124 +12,150 @@ namespace EarlyBirdAPI.Model.Repositories
     {
         public JobRepository(IConfiguration configuration) : base(configuration) { }
 
-        // C - Create a new job
-        public bool InsertJob(Job job)
-        {
-            using var dbConn = new NpgsqlConnection(ConnectionString);
-            var cmd = dbConn.CreateCommand();
-            cmd.CommandText = @"
-                INSERT INTO jobs (user_id, title, description, category_id, salary_range, location, status, posted_at)
-                VALUES (@user_id, @title, @description, @category_id, @salary_range, @location, @status, @posted_at)
-            ";
-
-            cmd.Parameters.AddWithValue("@user_id", NpgsqlDbType.Integer, job.UserId);
-            cmd.Parameters.AddWithValue("@title", NpgsqlDbType.Text, job.Title ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@description", NpgsqlDbType.Text, job.Description ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@category_id", NpgsqlDbType.Integer, job.CategoryId ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@salary_range", NpgsqlDbType.Text, job.SalaryRange ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@location", NpgsqlDbType.Text, job.Location ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, job.Status.ToString());
-            cmd.Parameters.AddWithValue("@posted_at", NpgsqlDbType.Timestamp, job.PostedAt ?? DateTime.UtcNow);
-
-            return InsertData(dbConn, cmd);
-        }
-
         // R - Get a job by ID
-        public Job? GetJobById(int jobId)
+        public Job? GetJobById(int id)
         {
-            using var dbConn = new NpgsqlConnection(ConnectionString);
-            var cmd = dbConn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM jobs WHERE job_id = @job_id";
-            cmd.Parameters.AddWithValue("@job_id", NpgsqlDbType.Integer, jobId);
-
-            var data = GetData(dbConn, cmd);
-            if (data != null && data.Read())
+            NpgsqlConnection dbConn = null;
+            try
             {
-                return new Job
-                {
-                    JobId = Convert.ToInt32(data["job_id"]),
-                    UserId = Convert.ToInt32(data["user_id"]),
-                    Title = data["title"] as string ?? "",
-                    Description = data["description"] as string,
-                    CategoryId = data["category_id"] as int?,
-                    SalaryRange = data["salary_range"] as string,
-                    Location = data["location"] as string,
-                    Status = Enum.Parse<JobPostingStatus>(data["status"].ToString() ?? "Open"),
-                    PostedAt = data["posted_at"] as DateTime?
-                };
-            }
+                dbConn = new NpgsqlConnection(ConnectionString);
+                var cmd = dbConn.CreateCommand();
+                cmd.CommandText = "SELECT * FROM public.job WHERE id = @id";
+                cmd.Parameters.Add("@id", NpgsqlDbType.Integer).Value = id;
 
-            return null;
+                var data = GetData(dbConn, cmd);
+                if (data != null && data.Read())
+                {
+                    return new Job
+                    {
+                        Id = Convert.ToInt32(data["id"]),
+                        EmployerId = Convert.ToInt32(data["employerid"]),
+                        Title = data["title"].ToString() ?? string.Empty,
+                        Description = data["description"] as string,
+                        Location = data["location"] as string,
+                        SalaryRange = data["salaryrange"] as string,
+                        Category = data["category"] as string,
+                        Status = Enum.Parse<JobStatus>(data["status"].ToString()!)
+                    };
+                }
+                return null;
+            }
+            finally
+            {
+                dbConn?.Close();
+            }
         }
 
         // R - Get all jobs
         public List<Job> GetJobs()
         {
-            using var dbConn = new NpgsqlConnection(ConnectionString);
-            var cmd = dbConn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM jobs";
-
-            var data = GetData(dbConn, cmd);
+            NpgsqlConnection dbConn = null;
             var jobs = new List<Job>();
-            while (data != null && data.Read())
+            try
             {
-                jobs.Add(new Job
-                {
-                    JobId = Convert.ToInt32(data["job_id"]),
-                    UserId = Convert.ToInt32(data["user_id"]),
-                    Title = data["title"] as string ?? "",
-                    Description = data["description"] as string,
-                    CategoryId = data["category_id"] as int?,
-                    SalaryRange = data["salary_range"] as string,
-                    Location = data["location"] as string,
-                    Status = Enum.Parse<JobPostingStatus>(data["status"].ToString() ?? "Open"),
-                    PostedAt = data["posted_at"] as DateTime?
-                });
-            }
+                dbConn = new NpgsqlConnection(ConnectionString);
+                var cmd = dbConn.CreateCommand();
+                cmd.CommandText = "SELECT * FROM public.job";
 
-            return jobs;
+                var data = GetData(dbConn, cmd);
+                if (data != null)
+                {
+                    while (data.Read())
+                    {
+                        var job = new Job
+                        {
+                            Id = Convert.ToInt32(data["id"]),
+                            EmployerId = Convert.ToInt32(data["employerid"]),
+                            Title = data["title"].ToString() ?? string.Empty,
+                            Description = data["description"] as string,
+                            Location = data["location"] as string,
+                            SalaryRange = data["salaryrange"] as string,
+                            Category = data["category"] as string,
+                            Status = Enum.Parse<JobStatus>(data["status"].ToString()!)
+                        };
+                        jobs.Add(job);
+                    }
+                }
+                return jobs;
+            }
+            finally
+            {
+                dbConn?.Close();
+            }
+        }
+
+        // C - Insert a new job
+        public bool InsertJob(Job job)
+        {
+            NpgsqlConnection dbConn = null;
+            try
+            {
+                dbConn = new NpgsqlConnection(ConnectionString);
+                var cmd = dbConn.CreateCommand();
+                cmd.CommandText = @"
+                    INSERT INTO public.job
+                    (employerid, title, description, location, salaryrange, category, status)
+                    VALUES
+                    (@employerid, @title, @description, @location, @salaryrange, @category, @status);
+                ";
+
+                cmd.Parameters.AddWithValue("@employerid", NpgsqlDbType.Integer, job.EmployerId);
+                cmd.Parameters.AddWithValue("@title", NpgsqlDbType.Text, job.Title);
+                cmd.Parameters.AddWithValue("@description", NpgsqlDbType.Text, job.Description ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@location", NpgsqlDbType.Text, job.Location ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@salaryrange", NpgsqlDbType.Text, job.SalaryRange ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@category", NpgsqlDbType.Text, job.Category ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, job.Status.ToString());
+
+                bool result = InsertData(dbConn, cmd);
+                return result;
+            }
+            finally
+            {
+                dbConn?.Close();
+            }
         }
 
         // U - Update an existing job
         public bool UpdateJob(Job job)
         {
-            using var dbConn = new NpgsqlConnection(ConnectionString);
+            var dbConn = new NpgsqlConnection(ConnectionString);
             var cmd = dbConn.CreateCommand();
             cmd.CommandText = @"
-                UPDATE jobs SET
-                    user_id = @user_id,
+                UPDATE public.job SET
+                    employerid = @employerid,
                     title = @title,
                     description = @description,
-                    category_id = @category_id,
-                    salary_range = @salary_range,
                     location = @location,
-                    status = @status,
-                    posted_at = @posted_at
-                WHERE job_id = @job_id
+                    salaryrange = @salaryrange,
+                    category = @category,
+                    status = @status
+                WHERE id = @id;
             ";
 
-            cmd.Parameters.AddWithValue("@user_id", NpgsqlDbType.Integer, job.UserId);
-            cmd.Parameters.AddWithValue("@title", NpgsqlDbType.Text, job.Title ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@employerid", NpgsqlDbType.Integer, job.EmployerId);
+            cmd.Parameters.AddWithValue("@title", NpgsqlDbType.Text, job.Title);
             cmd.Parameters.AddWithValue("@description", NpgsqlDbType.Text, job.Description ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@category_id", NpgsqlDbType.Integer, job.CategoryId ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@salary_range", NpgsqlDbType.Text, job.SalaryRange ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@location", NpgsqlDbType.Text, job.Location ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@salaryrange", NpgsqlDbType.Text, job.SalaryRange ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@category", NpgsqlDbType.Text, job.Category ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@status", NpgsqlDbType.Text, job.Status.ToString());
-            cmd.Parameters.AddWithValue("@posted_at", NpgsqlDbType.Timestamp, job.PostedAt ?? DateTime.UtcNow);
-            cmd.Parameters.AddWithValue("@job_id", NpgsqlDbType.Integer, job.JobId);
+            cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, job.Id);
 
-            return UpdateData(dbConn, cmd);
+            bool result = UpdateData(dbConn, cmd);
+            return result;
         }
 
         // D - Delete a job
-        public bool DeleteJob(int jobId)
+        public bool DeleteJob(int id)
         {
-            using var dbConn = new NpgsqlConnection(ConnectionString);
+            var dbConn = new NpgsqlConnection(ConnectionString);
             var cmd = dbConn.CreateCommand();
-            cmd.CommandText = "DELETE FROM jobs WHERE job_id = @job_id";
-            cmd.Parameters.AddWithValue("@job_id", NpgsqlDbType.Integer, jobId);
+            cmd.CommandText = "DELETE FROM public.job WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, id);
 
-            return DeleteData(dbConn, cmd);
+            bool result = DeleteData(dbConn, cmd);
+            return result;
         }
     }
 }

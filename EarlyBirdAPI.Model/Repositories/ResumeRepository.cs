@@ -1,123 +1,131 @@
+using System;
+using System.Collections.Generic;
 using EarlyBirdAPI.Model.Entities;
-using EarlyBirdAPI.Model.Repositories;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using NpgsqlTypes;
-using System;
-using System.Collections.Generic;
 
-namespace EarlyBird.Model.Repositories
+namespace EarlyBirdAPI.Model.Repositories
 {
     public class ResumeRepository : BaseRepository
     {
-        public ResumeRepository(IConfiguration configuration) : base(configuration) { }
-
-        // Create - Insert a new resume record
-        public bool InsertResume(Resume r)
+        public ResumeRepository(IConfiguration configuration) : base(configuration)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
-            {
-                var cmd = dbConn.CreateCommand();
-                cmd.CommandText = @"
-                    INSERT INTO resumes (user_id, file_path, uploaded_at, is_active)
-                    VALUES (@user_id, @file_path, @uploaded_at, @is_active)
-                ";
-
-                cmd.Parameters.AddWithValue("@user_id", NpgsqlDbType.Integer, r.UserId);
-                cmd.Parameters.AddWithValue("@file_path", NpgsqlDbType.Text, r.FilePath);
-                // Set uploaded_at to current time if not provided
-                cmd.Parameters.AddWithValue("@uploaded_at", NpgsqlDbType.Timestamp, r.UploadedAt ?? DateTime.UtcNow);
-                cmd.Parameters.AddWithValue("@is_active", NpgsqlDbType.Boolean, r.IsActive ?? true);
-
-                return InsertData(dbConn, cmd);
-            }
         }
 
-        // Read - Get resume by resume_id
-        public Resume? GetResumeById(int resumeId)
+        // Read - Get resume by id
+        public Resume? GetResumeById(int id)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection dbConn = null;
+            try
             {
+                // create a new connection for database
+                dbConn = new NpgsqlConnection(ConnectionString);
                 var cmd = dbConn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM resumes WHERE resume_id = @resume_id";
-                cmd.Parameters.AddWithValue("@resume_id", NpgsqlDbType.Integer, resumeId);
+                cmd.CommandText = "SELECT id, jobseekerid, content FROM public.resume WHERE id = @id";
+                cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, id);
 
                 var data = GetData(dbConn, cmd);
                 if (data != null && data.Read())
                 {
                     return new Resume
                     {
-                        ResumeId = Convert.ToInt32(data["resume_id"]),
-                        UserId = Convert.ToInt32(data["user_id"]),
-                        FilePath = data["file_path"].ToString() ?? "",
-                        UploadedAt = data["uploaded_at"] as DateTime?,
-                        IsActive = data["is_active"] as bool?
+                        Id = Convert.ToInt32(data["id"]),
+                        JobseekerId = Convert.ToInt32(data["jobseekerid"]),
+                        Content = data["content"].ToString() ?? string.Empty
                     };
                 }
                 return null;
             }
+            finally
+            {
+                dbConn?.Close();
+            }
         }
 
-        // Read - Get all resumes for a given user
-        public List<Resume> GetResumesByUserId(int userId)
+        // Read - Get all resumes
+        public List<Resume> GetResumes()
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
+            NpgsqlConnection dbConn = null;
+            var resumes = new List<Resume>();
+            try
             {
+                // create a new connection for database
+                dbConn = new NpgsqlConnection(ConnectionString);
                 var cmd = dbConn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM resumes WHERE user_id = @user_id";
-                cmd.Parameters.AddWithValue("@user_id", NpgsqlDbType.Integer, userId);
+                cmd.CommandText = "SELECT id, jobseekerid, content FROM public.resume";
 
                 var data = GetData(dbConn, cmd);
-                var resumes = new List<Resume>();
                 while (data != null && data.Read())
                 {
                     resumes.Add(new Resume
                     {
-                        ResumeId = Convert.ToInt32(data["resume_id"]),
-                        UserId = Convert.ToInt32(data["user_id"]),
-                        FilePath = data["file_path"].ToString() ?? "",
-                        UploadedAt = data["uploaded_at"] as DateTime?,
-                        IsActive = data["is_active"] as bool?
+                        Id = Convert.ToInt32(data["id"]),
+                        JobseekerId = Convert.ToInt32(data["jobseekerid"]),
+                        Content = data["content"].ToString() ?? string.Empty
                     });
                 }
                 return resumes;
+            }
+            finally
+            {
+                dbConn?.Close();
+            }
+        }
+
+        // Create - Insert a new resume record
+        public bool InsertResume(Resume r)
+        {
+            NpgsqlConnection dbConn = null;
+            try
+            {
+                // create a new connection for database
+                dbConn = new NpgsqlConnection(ConnectionString);
+                var cmd = dbConn.CreateCommand();
+                cmd.CommandText = @"
+                    INSERT INTO public.resume (jobseekerid, content)
+                    VALUES (@jobseekerid, @content)
+                ";
+
+                cmd.Parameters.AddWithValue("@jobseekerid", NpgsqlDbType.Integer, r.JobseekerId);
+                cmd.Parameters.AddWithValue("@content", NpgsqlDbType.Text, r.Content);
+
+                return InsertData(dbConn, cmd);
+            }
+            finally
+            {
+                dbConn?.Close();
             }
         }
 
         // Update - Update an existing resume record
         public bool UpdateResume(Resume r)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
-            {
-                var cmd = dbConn.CreateCommand();
-                cmd.CommandText = @"
-                    UPDATE resumes SET
-                        file_path = @file_path,
-                        uploaded_at = @uploaded_at,
-                        is_active = @is_active
-                    WHERE resume_id = @resume_id
-                ";
+            var dbConn = new NpgsqlConnection(ConnectionString);
+            var cmd = dbConn.CreateCommand();
+            cmd.CommandText = @"
+                UPDATE public.resume SET
+                    jobseekerid = @jobseekerid,
+                    content = @content
+                WHERE id = @id
+            ";
 
-                cmd.Parameters.AddWithValue("@file_path", NpgsqlDbType.Text, r.FilePath);
-                cmd.Parameters.AddWithValue("@uploaded_at", NpgsqlDbType.Timestamp, r.UploadedAt ?? DateTime.UtcNow);
-                cmd.Parameters.AddWithValue("@is_active", NpgsqlDbType.Boolean, r.IsActive ?? true);
-                cmd.Parameters.AddWithValue("@resume_id", NpgsqlDbType.Integer, r.ResumeId);
+            cmd.Parameters.AddWithValue("@jobseekerid", NpgsqlDbType.Integer, r.JobseekerId);
+            cmd.Parameters.AddWithValue("@content", NpgsqlDbType.Text, r.Content);
+            cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, r.Id);
 
-                return UpdateData(dbConn, cmd);
-            }
+            return UpdateData(dbConn, cmd);
         }
 
         // Delete - Delete a resume record by its ID
-        public bool DeleteResume(int resumeId)
+        public bool DeleteResume(int id)
         {
-            using (var dbConn = new NpgsqlConnection(ConnectionString))
-            {
-                var cmd = dbConn.CreateCommand();
-                cmd.CommandText = "DELETE FROM resumes WHERE resume_id = @resume_id";
-                cmd.Parameters.AddWithValue("@resume_id", NpgsqlDbType.Integer, resumeId);
+            var dbConn = new NpgsqlConnection(ConnectionString);
+            var cmd = dbConn.CreateCommand();
+            cmd.CommandText = "DELETE FROM public.resume WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", NpgsqlDbType.Integer, id);
 
-                return DeleteData(dbConn, cmd);
-            }
+            return DeleteData(dbConn, cmd);
         }
     }
 }

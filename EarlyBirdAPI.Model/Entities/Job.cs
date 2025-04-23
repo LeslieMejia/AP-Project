@@ -3,43 +3,24 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EarlyBirdAPI.Model.Entities;
-
-[Table("jobs")]
-public class Job
+namespace EarlyBirdAPI.Model.Entities
 {
-    [Key]
-    [Column("job_id")]
-    public int JobId { get; set; }
+    public class Job
+    {
+        public int Id { get; set; }
 
-    [Column("user_id")]
-    public int UserId { get; set; }
+        public int EmployerId { get; set; }
 
-    [Column("title")]
-    public string Title { get; set; } = null!;
+        public string Title { get; set; } = string.Empty;
 
-    [Column("description")]
-    public string? Description { get; set; }
+        public string? Description { get; set; }
 
-    [Column("category_id")]
-    public int? CategoryId { get; set; }
+        public string? Location { get; set; }
 
-    [Column("salary_range")]
-    public string? SalaryRange { get; set; }
+        public string? SalaryRange { get; set; }
 
-    [Column("location")]
-    public string? Location { get; set; }
+        public string? Category { get; set; }
 
-    [Column("status")]
-    public JobPostingStatus Status { get; set; }
-
-    [Column("posted_at")]
-    public DateTime? PostedAt { get; set; }
-
-    [ForeignKey("UserId")]
-    public virtual User User { get; set; } = null!;
-
-    public virtual ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
-
-    public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
+        public JobStatus Status { get; set; }
+    }
 }

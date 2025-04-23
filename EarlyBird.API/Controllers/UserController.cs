@@ -1,98 +1,74 @@
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using EarlyBirdAPI.Model.Entities;         // Your entity classes (User, etc.)
 using EarlyBird.Model.Repositories;         // Your repository classes
 
-namespace EarlyBirdAPI.Controllers
+namespace EarlyBird.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        // Use dependency injection to get your repository
-        protected UserRepository Repository { get; }
+        private readonly UserRepository _userRepository;
 
-        public UserController(UserRepository repository)
+        public UserController(UserRepository userRepository)
         {
-            Repository = repository;
+            _userRepository = userRepository;
         }
 
-        // GET: api/User/5
-        [HttpGet("{id}")]
-        public ActionResult<User> GetUser([FromRoute] int id)
+        // GET: api/user
+        [HttpGet]
+        public ActionResult<List<User>> GetAllUsers()
         {
-            User user = Repository.GetUserById(id);
+            var users = _userRepository.GetUsers();
+            return Ok(users);
+        }
+
+        // GET: api/user/5
+        [HttpGet("{id}")]
+        public ActionResult<User> GetUserById(int id)
+        {
+            var user = _userRepository.GetUserById(id);
             if (user == null)
-            {
-                return NotFound($"User with id {id} not found");
-            }
+                return NotFound();
             return Ok(user);
         }
 
-        // GET: api/User
-        [HttpGet]
-        public ActionResult<IEnumerable<User>> GetUsers()
-        {
-            return Ok(Repository.GetUsers());
-        }
-
-        // POST: api/User
+        // POST: api/user
         [HttpPost]
-        public ActionResult Post([FromBody] User user)
+        public ActionResult CreateUser([FromBody] User user)
         {
-            if (user == null)
-            {
-                return BadRequest("User info not provided");
-            }
-
-            bool status = Repository.InsertUser(user);
-            if (status)
-            {
-                return Ok("User created successfully");
-            }
-            return BadRequest("Failed to create user");
+            var success = _userRepository.InsertUser(user);
+            if (success)
+                return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            return BadRequest("Could not insert user.");
         }
 
-        // PUT: api/User
-        [HttpPut]
-        public ActionResult UpdateUser([FromBody] User user)
+        // PUT: api/user/5
+        [HttpPut("{id}")]
+        public ActionResult UpdateUser(int id, [FromBody] User user)
         {
-            if (user == null)
-            {
-                return BadRequest("User info not provided");
-            }
+            if (id != user.Id)
+                return BadRequest("ID mismatch.");
 
-            // Check if the user exists
-            User existingUser = Repository.GetUserById(user.UserId);
+            var existingUser = _userRepository.GetUserById(id);
             if (existingUser == null)
-            {
-                return NotFound($"User with id {user.UserId} not found");
-            }
+                return NotFound();
 
-            bool status = Repository.UpdateUser(user);
-            if (status)
-            {
-                return Ok("User updated successfully");
-            }
-            return BadRequest("Failed to update user");
+            var success = _userRepository.UpdateUser(user);
+            return success ? NoContent() : StatusCode(500, "Update failed.");
         }
 
-        // DELETE: api/User/5
+        // DELETE: api/user/5
         [HttpDelete("{id}")]
-        public ActionResult DeleteUser([FromRoute] int id)
+        public ActionResult DeleteUser(int id)
         {
-            User existingUser = Repository.GetUserById(id);
+            var existingUser = _userRepository.GetUserById(id);
             if (existingUser == null)
-            {
-                return NotFound($"User with id {id} not found");
-            }
-            bool status = Repository.DeleteUser(id);
-            if (status)
-            {
-                return NoContent(); // Successfully deleted, no content to return.
-            }
-            return BadRequest($"Unable to delete user with id {id}");
+                return NotFound();
+
+            var success = _userRepository.DeleteUser(id);
+            return success ? NoContent() : StatusCode(500, "Delete failed.");
         }
     }
 }

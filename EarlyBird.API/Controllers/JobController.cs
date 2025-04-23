@@ -3,81 +3,79 @@ using Microsoft.AspNetCore.Mvc;
 using EarlyBirdAPI.Model.Entities;         // Your entity classes (Job, etc.)
 using EarlyBirdAPI.Model.Repositories;     // Your repository classes
 
-namespace EarlyBirdAPI.Controllers
+namespace EarlyBird.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class JobController : ControllerBase
     {
-        // Use dependency injection to get your repository
         protected JobRepository Repository { get; }
 
         public JobController(JobRepository repository)
         {
             Repository = repository;
         }
-
-        // GET: api/Job/5
+    
+        // GET - Retrieve a specific job by ID
         [HttpGet("{id}")]
         public ActionResult<Job> GetJob([FromRoute] int id)
         {
             Job job = Repository.GetJobById(id);
             if (job == null)
             {
-                return NotFound($"Job with id {id} not found");
+                return NotFound();
             }
             return Ok(job);
         }
-
-        // GET: api/Job
+    
+         // GET - Retrieve all jobs
         [HttpGet]
         public ActionResult<IEnumerable<Job>> GetJobs()
         {
             return Ok(Repository.GetJobs());
         }
 
-        // POST: api/Job
+         // POST - Insert a new job
         [HttpPost]
         public ActionResult Post([FromBody] Job job)
         {
             if (job == null)
             {
-                return BadRequest("Job info not provided");
+                return BadRequest("Job data is not correct");
             }
-
             bool status = Repository.InsertJob(job);
             if (status)
             {
-                return Ok("Job created successfully");
+                return Ok();
             }
-            return BadRequest("Failed to create job");
+            return BadRequest("Failed to insert job");
         }
-
-        // PUT: api/Job
+        
+        // PUT - Update an existing job
         [HttpPut]
         public ActionResult UpdateJob([FromBody] Job job)
         {
             if (job == null)
             {
-                return BadRequest("Job info not provided");
+                return BadRequest("Job data is not correct");
             }
 
-            // Check if the job exists
-            Job existingJob = Repository.GetJobById(job.JobId);
+            Job existingJob = Repository.GetJobById(job.Id);
             if (existingJob == null)
             {
-                return NotFound($"Job with id {job.JobId} not found");
+                return NotFound($"Job with id {job.Id} not found");
             }
 
             bool status = Repository.UpdateJob(job);
             if (status)
             {
-                return Ok("Job updated successfully");
+                return Ok();
             }
-            return BadRequest("Failed to update job");
+
+            return BadRequest("Something went wrong while updating");
         }
 
-        // DELETE: api/Job/5
+        // DELETE - Delete a job by ID
         [HttpDelete("{id}")]
         public ActionResult DeleteJob([FromRoute] int id)
         {
@@ -86,11 +84,13 @@ namespace EarlyBirdAPI.Controllers
             {
                 return NotFound($"Job with id {id} not found");
             }
+
             bool status = Repository.DeleteJob(id);
             if (status)
             {
-                return NoContent(); // Successfully deleted, no content to return.
+                return NoContent();
             }
+
             return BadRequest($"Unable to delete job with id {id}");
         }
     }
